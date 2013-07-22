@@ -14,7 +14,7 @@
   },
   "scripts": {
     "test": "test",
-	"prepublish": "bower install  && git ls-files -z dist/ | xargs -0 git update-index --assume-unchanged"
+	"prepublish": "git ls-files -z dist/ | xargs -0 git update-index --assume-unchanged"
   },
   "repository": "",
   "keywords": [
