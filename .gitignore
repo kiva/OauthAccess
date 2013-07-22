@@ -1,9 +1,6 @@
 .DS_Store
 .idea
 npm-debug.log
+/node_modules
 /doc/plato
 /src/lib
-
-#temporary
-/src/kiva.js
-/src/oauth.js

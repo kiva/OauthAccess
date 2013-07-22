@@ -1,6 +1,6 @@
 define(function () {
 
-	//= ../src/js/OauthAccess.js
+	//= ../src/OauthAccess.js
 
 	//= ../lib/sha1.js
 
