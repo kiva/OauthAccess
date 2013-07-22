@@ -21,6 +21,31 @@ OauthAccess.extend = function (target, obj) {
 };
 
 
+/**
+ * Converts a data object into an array
+ *
+ * @param obj
+ * @returns {Array}
+ */
+OauthAccess.arrayify = function (obj) {
+	if (typeof obj != 'object') {
+		throw 'Data must be an [object]'
+	}
+
+	var arr = [];
+	for (var key in obj) {
+		if (obj.hasOwnProperty(key)) {
+			arr.push({
+				key: key
+				, val: obj[key]
+			});
+		}
+	}
+
+	return arr;
+};
+
+
 OauthAccess.generateNonce = function () {
 	return Math.random() * 10000000;
 };
@@ -128,7 +153,9 @@ OauthAccess.generateSignature = function (httpMethod, baseUrl, params, nonce, ti
 OauthAccess.prototype = {
 
 	_generateHeader: function (httpMethod, url, params, token, tokenSecret, key, callback) {
-		params = params || {};
+		params = params
+			? OauthAccess.arrayify(params)
+			: [];
 
 		if (typeof httpMethod != 'string') {
 			httpMethod = 'GET';
@@ -149,7 +176,7 @@ OauthAccess.prototype = {
 
 		if (queryStart > -1) {
 			baseUrl = url.slice(0, queryStart);
-			OauthAccess.extend(params, OauthAccess.parseQueryParams(url.slice(queryStart + 1)));
+			params.concat(OauthAccess.parseQueryParams(url.slice(queryStart + 1)));
 		} else {
 			baseUrl = url;
 		}
