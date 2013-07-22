@@ -1,0 +1,10 @@
+.DS_Store
+.idea
+npm-debug.log
+/dist
+/doc/plato
+/src/lib
+
+#temporary
+/src/kiva.js
+/src/oauth.js
