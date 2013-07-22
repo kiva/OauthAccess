@@ -128,26 +128,24 @@
 	 *
 	 * @param {String} httpMethod
 	 * @param {String} baseUrl
-	 * @param {String} params
+	 * @param {Array} params
 	 * @param {String} nonce
 	 * @param {String} timestamp
-	 * @param {String} token
-	 * @param {String} tokenSecret
-	 * @param {String} key
-	 * @param {String} callback
+	 * @param {String} encToken
+	 * @param {String} encTokenSecret
+	 * @param {String} encKey
+	 * @param {String} encCallback
 	 * @return {String}
 	 */
-	OauthAccess.generateSignature = function (httpMethod, baseUrl, params, nonce, timestamp, token, tokenSecret, key, callback) {
+	OauthAccess.generateSignature = function (httpMethod, baseUrl, params, nonce, timestamp, encToken, encTokenSecret, encKey, encCallback) {
 		var base;
 	
-		params = params || [];
-	
-		params.push({key: 'oauth_callback', val: callback});
-		params.push({key: 'oauth_consumer_key', val: key});
+		params.push({key: 'oauth_callback', val: encCallback});
+		params.push({key: 'oauth_consumer_key', val: encKey});
 		params.push({key: 'oauth_nonce', val: nonce});
 		params.push({key: 'oauth_signature_method', val: 'HMAC-SHA1-QI'});
 		params.push({key: 'oauth_timestamp', val: timestamp});
-		params.push({key: 'oauth_token', val: token});
+		params.push({key: 'oauth_token', val: encToken});
 		params.push({key: 'oauth_version', val: '1.0'});
 	
 		params = OauthAccess.sortParams(params);
@@ -155,57 +153,68 @@
 		params = OauthAccess.serializeParams(params);
 	
 		base = httpMethod.toUpperCase() + '&' + encodeURIComponent(baseUrl).toString() + '&' + params;
-		return b64_hmac_sha1(tokenSecret, base) + '=';
+		return b64_hmac_sha1(encTokenSecret, base) + '=';
+	};
+	
+	
+	/**
+	 *
+	 * @param httpMethod
+	 * @param url
+	 * @param params
+	 * @param token
+	 * @param tokenSecret
+	 * @param key
+	 * @param callback
+	 * @returns {string}
+	 */
+	OauthAccess.generateHeader = function (httpMethod, url, params, token, tokenSecret, key, callback) {
+		params = params
+			? OauthAccess.arrayify(params)
+			: [];
+	
+		if (typeof httpMethod != 'string') {
+			httpMethod = 'GET';
+		}
+	
+		if (! url) {
+			throw 'Unable to generate an authorization header: No "url" provided';
+		}
+	
+		tokenSecret = tokenSecret || '';
+		callback = encodeURIComponent(callback);
+		key = encodeURIComponent(key);
+		token = encodeURIComponent(token);
+	
+		var baseUrl, signature
+		, nonce = OauthAccess.generateNonce()
+		, timestamp = OauthAccess.generateTimestamp()
+		, queryStart = url.indexOf('?');
+	
+		if (queryStart > -1) {
+			baseUrl = url.slice(0, queryStart);
+			params.concat(OauthAccess.parseQueryParams(url.slice(queryStart + 1)));
+		} else {
+			baseUrl = url;
+		}
+	
+		signature = OauthAccess.generateSignature(httpMethod, baseUrl, params, nonce, timestamp, token, encodeURIComponent(tokenSecret), key, callback);
+	
+		return 'OAuth oauth_nonce="' + encodeURIComponent(nonce) +
+			'",oauth_callback="' + callback +
+			'",oauth_signature_method="HMAC-SHA1-QI"' +
+			',oauth_timestamp="' + encodeURIComponent(timestamp) +
+			'",oauth_consumer_key="' + key +
+			'",oauth_signature="' + signature +
+			'",oauth_token="' + token +
+			'",oauth_version="1.0"';
 	};
 	
 	
 	OauthAccess.prototype = {
-	
-		_generateHeader: function (httpMethod, url, params, token, tokenSecret, key, callback) {
-			params = params
-				? OauthAccess.arrayify(params)
-				: [];
-	
-			if (typeof httpMethod != 'string') {
-				httpMethod = 'GET';
-			}
-	
-			if (! url) {
-				throw 'Unable to generate an authorization header: No "url" provided';
-			}
-	
-			callback = encodeURIComponent(callback);
-			key = encodeURIComponent(key);
-			token = encodeURIComponent(token);
-	
-			var baseUrl, signature
-			, nonce = OauthAccess.generateNonce()
-			, timestamp = OauthAccess.generateTimestamp()
-			, queryStart = url.indexOf('?');
-	
-			if (queryStart > -1) {
-				baseUrl = url.slice(0, queryStart);
-				params.concat(OauthAccess.parseQueryParams(url.slice(queryStart + 1)));
-			} else {
-				baseUrl = url;
-			}
-	
-			signature = OauthAccess.generateSignature(httpMethod, baseUrl, params, nonce, timestamp, token, encodeURIComponent(tokenSecret), key, encodeURIComponent(callback));
-	
-			return 'OAuth oauth_nonce="' + encodeURIComponent(nonce) +
-				'",oauth_callback="' + callback +
-				'",oauth_signature_method="HMAC-SHA1-QI"' +
-				',oauth_timestamp="' + encodeURIComponent(timestamp) +
-				'",oauth_consumer_key="' + key +
-				'",oauth_signature="' + signature +
-				'",oauth_token="' + token +
-				'",oauth_version="1.0"';
-		}
-	
-	
-		, generateHeader: function (httpMethod, baseUrl, params) {
+		generateHeader: function (httpMethod, baseUrl, params) {
 			var accessTokens = this.accessTokens;
-			return this._generateHeader(httpMethod, baseUrl, params, accessTokens.token, accessTokens.tokenSecret, this.key, this.callback);
+			return OauthAccess.generateHeader(httpMethod, baseUrl, params, accessTokens.token, accessTokens.tokenSecret, this.key, this.callback);
 		}
 	};
 
