@@ -1,4 +1,4 @@
-define(['jquery'], function ($) {
+define(function () {
 
 	//= ../src/js/OauthAccess.js
 

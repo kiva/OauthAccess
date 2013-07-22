@@ -8,8 +8,17 @@ var undefined;
  * @constructor
  */
 function OauthAccess(settings) {
-	$.extend(this, settings);
+	OauthAccess.extend(this, settings);
 }
+
+
+OauthAccess.extend = function (target, obj) {
+	for(var key in obj) {
+		if (obj.hasOwnProperty(key)) {
+			target[key] = obj[key];
+		}
+	}
+};
 
 
 OauthAccess.generateNonce = function () {
@@ -140,7 +149,7 @@ OauthAccess.prototype = {
 
 		if (queryStart > -1) {
 			baseUrl = url.slice(0, queryStart);
-			$.extend(params, OauthAccess.parseQueryParams(url.slice(queryStart + 1)));
+			OauthAccess.extend(params, OauthAccess.parseQueryParams(url.slice(queryStart + 1)));
 		} else {
 			baseUrl = url;
 		}
@@ -161,77 +170,5 @@ OauthAccess.prototype = {
 	, generateHeader: function (httpMethod, baseUrl, params) {
 		var accessTokens = this.accessTokens;
 		return this._generateHeader(httpMethod, baseUrl, params, accessTokens.token, accessTokens.tokenSecret, this.key, this.callback);
-	}
-
-
-	/**
-	 * @TODO
-	 *
-	 */
-	, fetchRequestTokens: function () {
-		var url = this.requestTokenUrl
-		, header = this._generateHeader('POST', url);
-
-		return $.ajax({
-			url: url
-			, type: 'POST'
-			, dataType: 'json'
-			, beforeSend: function (request) {
-				request.setRequestHeader("Authorization", header);
-			}
-		});
-	}
-
-
-	/**
-	 * @TODO
-	 *
-	 */
-	, fetchAccessTokens: function (requestToken, requestTokenSecret, verifier) {
-		var header
-		, url = this.accessTokenUrl;
-
-		if (! url) {
-			throw 'An "accessTokenUrl" must be set';
-		}
-
-		header = this._generateHeader('POST', url, undefined, requestToken, requestTokenSecret, verifier);
-
-		return $.getJSON({
-			url: url
-			, type: 'POST'
-			, dataType: 'json'
-			, beforeSend: function (request) {
-				request.setRequestHeader("Authorization", header);
-			}
-		});
-	}
-
-
-	/**
-	 * @TODO
-	 * Ripped out from api/oauth/kiva.js
-	 */
-	, authenticate: function () {
-		var authorizeUrl = 'https://www.kiva.org/oauth/authorize?response_type=code&client_id='+Consumer.key+'&type=web_server&scope=access&oauth_callback='+Consumer.callbackUrl;
-
-		$('body').append('<button id="authBtn">Authorize</button>');
-		$('#authBtn').click(function() {
-			fetchRequestToken(function(data) {
-				global.alert('Redirecting to the authorize page. Copy the authorization code and paste it back on this page.');
-				global.open(authorizeUrl+'&oauth_token='+data.oauth_token, '_blank');
-				global.focus();
-
-				$('#authBtn').remove();
-				$('body').append('<input id="oauth_verifier" type="text"/>').append('<button id="accessBtn">Get data</button>');
-				$('#accessBtn').click(function() {
-					fetchAccessToken(data.oauth_token, data.oauth_token_secret, $('#oauth_verifier').val(), function(data) {
-						fetchResource(resourceUrl, data.oauth_token, data.oauth_token_secret, function(data) {
-							global.alert('Hello '+data.user_account.first_name+' '+data.user_account.last_name);
-						});
-					});
-				});
-			});
-		});
 	}
 };
