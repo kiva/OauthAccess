@@ -70,10 +70,15 @@ OauthAccess.serializeParams = function (params) {
 };
 
 
+/**
+ *
+ * @param queryStr
+ * @returns {Array}
+ */
 OauthAccess.parseQueryParams = function (queryStr) {
 	var split
-		, queryParamsArray = []
-		, pairs = queryStr.split('&');
+	, queryParamsArray = []
+	, pairs = queryStr.split('&');
 
 	for (var i = 0; i < pairs.length; i++) {
 		split = pairs[i].split('=');
@@ -184,7 +189,7 @@ OauthAccess.generateHeader = function (httpMethod, url, params, token, tokenSecr
 
 	if (queryStart > -1) {
 		baseUrl = url.slice(0, queryStart);
-		params.concat(OauthAccess.parseQueryParams(url.slice(queryStart + 1)));
+		params = params.concat(OauthAccess.parseQueryParams(url.slice(queryStart + 1)));
 	} else {
 		baseUrl = url;
 	}
