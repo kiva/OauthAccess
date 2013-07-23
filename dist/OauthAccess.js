@@ -1,5 +1,5 @@
 /**
- * OauthAccess.js - v0.1.0 
+ * OauthAccess.js - v0.1.1 
  * Copyright (c) 2013 Kiva Microfunds
  * 
  * Licensed under the MIT license.
@@ -79,10 +79,15 @@
 	};
 	
 	
+	/**
+	 *
+	 * @param queryStr
+	 * @returns {Array}
+	 */
 	OauthAccess.parseQueryParams = function (queryStr) {
 		var split
-			, queryParamsArray = []
-			, pairs = queryStr.split('&');
+		, queryParamsArray = []
+		, pairs = queryStr.split('&');
 	
 		for (var i = 0; i < pairs.length; i++) {
 			split = pairs[i].split('=');
@@ -193,7 +198,7 @@
 	
 		if (queryStart > -1) {
 			baseUrl = url.slice(0, queryStart);
-			params.concat(OauthAccess.parseQueryParams(url.slice(queryStart + 1)));
+			params = params.concat(OauthAccess.parseQueryParams(url.slice(queryStart + 1)));
 		} else {
 			baseUrl = url;
 		}
