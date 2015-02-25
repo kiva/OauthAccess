@@ -45,6 +45,16 @@ module.exports = function(grunt) {
 		}
 
 
+		, shell: {
+			'rm-dist': {
+				options: {
+					stderr: false
+				},
+				command: 'rm -rf dist/*'
+			}
+		}
+
+
 		, uglify: {
 			target: {
 				options: {
