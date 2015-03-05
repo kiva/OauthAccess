@@ -55,7 +55,7 @@ module.exports = function(grunt) {
 				, tagName: 'v<%= version %>'
 				, commitMessage: 'Release v<%= version %>'
 				, tagMessage: 'Version <%= version %>'
-				, afterBumpTasks: ['build']
+				, beforeBumpTasks: ['build']
 			}
 		}
 
