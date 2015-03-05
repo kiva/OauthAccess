@@ -40,6 +40,26 @@ module.exports = function(grunt) {
 		}
 
 
+		, release: {
+			options: {
+				bump: true
+				, changelog: true
+				, file: 'package.json'
+				, additionalFiles: ['bower.json']
+				, add: true
+				, commit: true
+				, tag: true
+				, push: true
+				, pushTags: true
+				, npm: false
+				, tagName: 'v<%= version %>'
+				, commitMessage: 'Release v<%= version %>'
+				, tagMessage: 'Version <%= version %>'
+				, afterBump: ['build']
+			}
+		}
+
+
 		, rig: {
 			compile: {
 				options: {
@@ -78,6 +98,7 @@ module.exports = function(grunt) {
 
 
 	grunt.loadNpmTasks('grunt-buster');
+	grunt.loadNpmTasks('grunt-release');
 	grunt.loadNpmTasks('grunt-rigger');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
