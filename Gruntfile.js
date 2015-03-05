@@ -43,7 +43,7 @@ module.exports = function(grunt) {
 		, release: {
 			options: {
 				bump: true
-				, changelog: true
+				, changelog: false
 				, file: 'package.json'
 				, additionalFiles: ['bower.json']
 				, add: true
