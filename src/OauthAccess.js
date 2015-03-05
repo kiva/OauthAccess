@@ -1,6 +1,5 @@
 'use strict';
 
-var undefined;
 
 /**
  *
@@ -29,7 +28,7 @@ OauthAccess.extend = function (target, obj) {
  */
 OauthAccess.arrayify = function (obj) {
 	if (typeof obj != 'object') {
-		throw 'Data must be an [object]'
+		throw 'Data must be an [object]';
 	}
 
 	var arr = [];
@@ -129,17 +128,18 @@ OauthAccess.sortParams = function (params) {
  * @param {String} timestamp
  * @param {String} encToken
  * @param {String} encTokenSecret
+ * @param {String} signatureMethod
  * @param {String} encKey
  * @param {String} encCallback
  * @return {String}
  */
-OauthAccess.generateSignature = function (httpMethod, baseUrl, params, nonce, timestamp, encToken, encTokenSecret, encKey, encCallback) {
+OauthAccess.generateSignature = function (httpMethod, baseUrl, params, nonce, timestamp, encToken, encTokenSecret, signatureMethod, encKey, encCallback) {
 	var base;
 
 	params.push({key: 'oauth_callback', val: encCallback});
 	params.push({key: 'oauth_consumer_key', val: encKey});
 	params.push({key: 'oauth_nonce', val: nonce});
-	params.push({key: 'oauth_signature_method', val: 'HMAC-SHA1-QI'});
+	params.push({key: 'oauth_signature_method', val: signatureMethod});
 	params.push({key: 'oauth_timestamp', val: timestamp});
 	params.push({key: 'oauth_token', val: encToken});
 	params.push({key: 'oauth_version', val: '1.0'});
@@ -160,11 +160,12 @@ OauthAccess.generateSignature = function (httpMethod, baseUrl, params, nonce, ti
  * @param params
  * @param token
  * @param tokenSecret
+ * @param signatureMethod
  * @param key
  * @param callback
  * @returns {string}
  */
-OauthAccess.generateHeader = function (httpMethod, url, params, token, tokenSecret, key, callback) {
+OauthAccess.generateHeader = function (httpMethod, url, params, token, tokenSecret, signatureMethod, key, callback) {
 	params = params
 		? OauthAccess.arrayify(params)
 		: [];
@@ -194,11 +195,11 @@ OauthAccess.generateHeader = function (httpMethod, url, params, token, tokenSecr
 		baseUrl = url;
 	}
 
-	signature = OauthAccess.generateSignature(httpMethod, baseUrl, params, nonce, timestamp, token, encodeURIComponent(tokenSecret), key, callback);
+	signature = OauthAccess.generateSignature(httpMethod, baseUrl, params, nonce, timestamp, token, encodeURIComponent(tokenSecret), signatureMethod, key, callback);
 
 	return 'OAuth oauth_nonce="' + encodeURIComponent(nonce) +
 		'",oauth_callback="' + callback +
-		'",oauth_signature_method="HMAC-SHA1-QI"' +
+		'",oauth_signature_method="' + signatureMethod + '"' +
 		',oauth_timestamp="' + encodeURIComponent(timestamp) +
 		'",oauth_consumer_key="' + key +
 		'",oauth_signature="' + signature +
@@ -210,6 +211,6 @@ OauthAccess.generateHeader = function (httpMethod, url, params, token, tokenSecr
 OauthAccess.prototype = {
 	generateHeader: function (httpMethod, baseUrl, params) {
 		var accessTokens = this.accessTokens;
-		return OauthAccess.generateHeader(httpMethod, baseUrl, params, accessTokens.token, accessTokens.tokenSecret, this.key, this.callback);
+		return OauthAccess.generateHeader(httpMethod, baseUrl, params, accessTokens.token, accessTokens.tokenSecret, this.signatureMethod, this.key, this.callback);
 	}
 };

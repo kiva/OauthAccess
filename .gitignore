@@ -4,6 +4,7 @@ npm-debug.log
 /node_modules
 /doc/plato
 /src/lib
+/test/coverage
 
 
 ## The following are not ignored but are marked as "unchanged"

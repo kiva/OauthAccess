@@ -24,6 +24,14 @@ module.exports = function(grunt) {
 		}
 
 
+		, coveralls: {
+			basic: {
+				src: 'test/coverage/lcov.info'
+				, force: true
+			}
+		}
+
+
 		, jshint: {
 			options: {
 				jshintrc: '.jshintrc'
@@ -41,6 +49,16 @@ module.exports = function(grunt) {
 					'dist/amd/OauthAccess.js': ['build/_amd.js']
 					, 'dist/OauthAccess.js': ['build/_iife.js']
 				}
+			}
+		}
+
+
+		, shell: {
+			'rm-dist': {
+				options: {
+					stderr: false
+				},
+				command: 'rm -rf dist/*'
 			}
 		}
 
@@ -63,6 +81,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-rigger');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
+	grunt.loadNpmTasks('grunt-coveralls');
 
 	grunt.registerTask('test', ['jshint', 'buster']);
 	grunt.registerTask('build', ['rig', 'uglify']);
