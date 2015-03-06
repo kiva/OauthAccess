@@ -40,22 +40,13 @@ module.exports = function(grunt) {
 		}
 
 
-		, release: {
+		, 'release-it': {
 			options: {
-				bump: true
-				, changelog: false
-				, file: 'package.json'
-				, additionalFiles: ['bower.json']
-				, add: true
-				, commit: true
-				, tag: true
-				, push: true
-				, pushTags: true
-				, npm: false
-				, tagName: 'v<%= version %>'
-				, commitMessage: 'Release v<%= version %>'
-				, tagMessage: 'Version <%= version %>'
-				, beforeBumpTasks: ['build']
+				pkgFiles: ['package.json', 'bower.json'],
+				commitMessage: 'Release %s',
+				tagName: 'v%s',
+				tagAnnotation: 'Version %s',
+				buildCommand: 'grunt build'
 			}
 		}
 
@@ -98,11 +89,11 @@ module.exports = function(grunt) {
 
 
 	grunt.loadNpmTasks('grunt-buster');
-	grunt.loadNpmTasks('grunt-release');
-	grunt.loadNpmTasks('grunt-rigger');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-coveralls');
+	grunt.loadNpmTasks('grunt-release-it');
+	grunt.loadNpmTasks('grunt-rigger');
 
 	grunt.registerTask('test', ['jshint', 'buster']);
 	grunt.registerTask('build', ['rig', 'uglify']);
