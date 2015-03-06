@@ -1,6 +1,6 @@
 {
   "name": "OauthAccess",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Kiva oauth",
   "main": "Gruntfile.js",
   "homepage": "http://github.com/kiva/oauthaccess",
